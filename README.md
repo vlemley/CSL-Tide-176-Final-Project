@@ -1,6 +1,6 @@
 # The Effect of Tide Height on Branded California Sea Lion Abundance at Ano Nuevo Island 
 
-##Background
+## Background
 
 This project is looking at how tide heights impact the number of branded sea lions on Ano Nuevo Island. While Ano Nuevo is famous for its elphant seal, the island about a mile off of the coast is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily realy on haul outs to rest, molt, regulate body temperature. Their insulating fur is maintiend by oils in the skin and the most effective way for them to maintain their coat is by thuroughly drying off. This is most effectivley acomplished on dry land. 
 
