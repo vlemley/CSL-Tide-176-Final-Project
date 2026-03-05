@@ -10,20 +10,71 @@ editor: visual
 # read in tide and survery data
 library(here)
 library(brms)
+library(hms)
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
+library(lubridate)
 tides <- read.csv("data/tides.csv")
 surveys <- read.csv("data/surveys.csv")
 ```
 
+## Editing the Data sets
+
+### Tides
+
+We need to select tide data from the dates of surveys and get rid of all other dates, this new data set will be called survey_tides
+
 ```{r}
 # combine date and time into one column
 tides$date_time <- paste(tides$Date, tides$Time, sep = "-")
+#creating vector with survey dates
+target_dates <- as.Date(c("2025-05-01", "2025-05-12", "2025-05-28", "2025-06-05", "2025-06-17", "2025-06-30", "2025-07-02", "2025-07-07", "2025-07-15", "2025-07-24", "2025-07-29", "2025-08-12", "2025-08-15", "2025-08-25"))
+
+#filtering out all other dates and saving as survey_tides
+survey_tides <- tides %>%
+  filter(Date %in% target_dates) %>%
+  arrange(match(Date, target_dates))  
+  
+#view the results
+survey_tides
 ```
 
+Combine Date and Time columns into DateTime to set up for finding specific tide height for each survey time and date
+
 ```{r}
-m.tides <- lm(Pred ~ date_time, data = tides)
-y_new = approx(tides$x, tides$y, xout=2025/05/01-17:43)
+
+# convert Date and Time to correct format
+Date = col_date(format = "")
+Time = col_time(format = "")
+
+# combine Date and Time columns into DateTime
+survey_tides %>%
+  mutate(
+    # convert hms to period, then add to Date
+    DateTime = as.POSIXct(Date) + period_to_seconds(as.period(Time))
+  )
+
+# remove Day, Date, and Time column
+survey_tides <- survey_tides %>%
+  select(-Day, -datetime)
+
+survey_tides <- survey_tides %>%
+  select(-Date, -Time)
+
+
+# view the results
+head(survey_tides)
 ```
 
 ![]()
+Using aprox to find the approximate tide heights at each time listed in the vector
+
+```{r}
+
+survey_times$tide_height <- approx(
+  x = as.numeric(tides$DateTime),
+  y = tides$Height,
+  xout = as.numeric(survey_times$DateTime)
+)$y
+```
