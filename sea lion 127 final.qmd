@@ -17,8 +17,13 @@ surveys <- read.csv("data/surveys.csv")
 ```
 
 ```{r}
-# combine tide csv and survery csv 
+# combine date and time into one column
+tides$date_time <- paste(tides$Date, tides$Time, sep = "-")
+```
 
+```{r}
+m.tides <- lm(Pred ~ date_time, data = tides)
+y_new = approx(tides$x, tides$y, xout=2025/05/01-17:43)
 ```
 
 ![]()
