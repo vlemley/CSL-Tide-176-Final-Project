@@ -5,3 +5,20 @@ pdf: default
 gmf: default
 editor: visual
 ---
+
+```{r}
+# read in tide and survery data
+library(here)
+library(brms)
+library(tidyverse)
+library(ggplot2)
+tides <- read.csv("data/tides.csv")
+surveys <- read.csv("data/surveys.csv")
+```
+
+```{r}
+# combine tide csv and survery csv 
+
+```
+
+![]()
