@@ -1,5 +1,5 @@
 ---
-title: "sea lion 127 final"
+title: "sea lion 176 final"
 format: pdf
 pdf: default
 gmf: default
@@ -12,7 +12,7 @@ library(here)
 library(brms)
 library(hms)
 library(tidyverse)
-library(ggplot2)
+library(ggplot2) 
 library(dplyr)
 library(lubridate)
 tides <- read.csv("data/tides.csv")
@@ -26,8 +26,12 @@ surveys <- read.csv("data/surveys.csv")
 We need to select tide data from the dates of surveys and get rid of all other dates, this new data set will be called survey_tides
 
 ```{r}
-# combine date and time into one column
-tides$date_time <- paste(tides$Date, tides$Time, sep = "-")
+# converting the column to date format
+tides$Date <- as.Date(tides$Date, format = "%Y/%m/%d")
+
+# combine date and time into one column called date_time
+tides$date_time <- ymd_hm(paste(tides$Date, tides$Time))
+
 #creating vector with survey dates
 target_dates <- as.Date(c("2025-05-01", "2025-05-12", "2025-05-28", "2025-06-05", "2025-06-17", "2025-06-30", "2025-07-02", "2025-07-07", "2025-07-15", "2025-07-24", "2025-07-29", "2025-08-12", "2025-08-15", "2025-08-25"))
 
@@ -37,7 +41,7 @@ survey_tides <- tides %>%
   arrange(match(Date, target_dates))  
   
 #view the results
-survey_tides
+print(survey_tides)
 ```
 
 Combine Date and Time columns into DateTime to set up for finding specific tide height for each survey time and date
@@ -57,24 +61,124 @@ survey_tides %>%
 
 # remove Day, Date, and Time column
 survey_tides <- survey_tides %>%
-  select(-Day, -datetime)
-
-survey_tides <- survey_tides %>%
-  select(-Date, -Time)
-
+  select(-Day, -Date, -Time)
 
 # view the results
 head(survey_tides)
 ```
 
 ![]()
-Using aprox to find the approximate tide heights at each time listed in the vector
+
+### Seal Surveys
+
+Combining date and time columns in seal survey data
 
 ```{r}
+#combining date and time into one column for seal data 
 
-survey_times$tide_height <- approx(
-  x = as.numeric(tides$DateTime),
-  y = tides$Height,
-  xout = as.numeric(survey_times$DateTime)
-)$y
+surveys <- surveys %>%
+ mutate(
+   DateTime=parse_date_time(paste(Date,Time), "Ymd HMS p") #formating time to 24 hr 
+ )
+
+#removing the seperate date and time columns 
+surveys <- surveys %>%
+  select(-Date, -Time)
+
+# view results 
+head(surveys)
+
+
+```
+
+### Matching each seal survey to nearest tide measurement
+
+#### Creating vectors
+
+Pairing the seal survey dates vector with their corresponding time stamps
+
+```{r}
+#creating a vector of seal survey times 
+survey_time_vector <- c("17:43:30","09:32:42", "10:41:51", "08:28:14", "08:20:54", "08:52:25", "10:10:56", "09:38:41", "09:33:07", "08:27:45", "09:08:02", "09:18:32", "08:50:31", "09:59:10")
+
+#created a vector where each seal survey date is paired with its time stamp 
+survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
+                           format= "%Y-%m-%d %H:%M")
+
+
+```
+
+Using approx to find the approximate tide heights at each time listed in the vector
+
+```{r}
+#doing a linear interpolation to get the approximate tide heights for the times of the seal surveys, using the approx function
+
+survey_tide_heights <- approx(
+  x = as.numeric(tides$date_time),
+                      #x is tide datetimes
+  y = tides$Pred, 
+                    #y is the tide heights
+  xout= as.numeric(survey_times) 
+  #xout is the seal survey date times
+) $y #extracts the interpolated tide heights from the output 
+
+#created a vector of tide heights at each seal survey time 
+```
+
+#### Creating a new table
+
+```{r}
+#creaing a data frame of tide heights at each seal survey time 
+survey_table <- data.frame(
+  SurveyTime = survey_times,  #column for times
+  TideHeight = survey_tide_heights #column for heights corresponding to those heights 
+)
+
+# view results 
+head(survey_table)
+```
+
+### Putting it all together 
+
+```{r}
+#creating a date frame with survey dates, survey times, tide heights, and seal count 
+survey_table_complete <- data.frame(
+  SurveyDateTime = survey_times, 
+  TideHeight = survey_tide_heights, 
+  SealCount = surveys$Observed #number of seals observed 
+)
+ #view the results 
+head(survey_table_complete)
+```
+
+## Exploring the data
+
+### Simple plots? 
+
+```{r}
+#tide height compared to observed seal counts
+ggplot(survey_table_complete, aes(x=TideHeight, y=SealCount)) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  labs( title = "Seal Counts vs Tide Height", 
+        x = "Tide Height", 
+        y = "Seal Count") #adding a title and axis labels 
+```
+
+We can see that their may be a slightly positive increase as seal count does increase with tide height. This is just a initially visualization of the data.
+
+#### Seal count as a function of tide height 
+
+```{r}
+# Seal Count ~ Tide Height 
+m.count.height <-
+brm(data = survey_table_complete, #gave the model the data 
+family = gaussian,#choose a normal distribution
+SealCount ~ 1 + TideHeight,
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
+file = "output/m.count.height")
+
+#results 
+summary(m.count.height)
+plot(m.count.height)
 ```
