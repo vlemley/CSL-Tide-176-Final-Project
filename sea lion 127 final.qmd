@@ -67,11 +67,15 @@ survey_tides <- survey_tides %>%
 head(survey_tides)
 ```
 
+<<<<<<< HEAD
 ![]()
 
 ### Seal Surveys
 
 Combining date and time columns in seal survey data
+=======
+![]() Using aprox to find the approximate tide heights at each time listed in the vector
+>>>>>>> 4417695 (not sure here)
 
 ```{r}
 #combining date and time into one column for seal data 
