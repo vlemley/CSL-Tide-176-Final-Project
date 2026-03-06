@@ -123,7 +123,7 @@ survey_tide_heights <- approx(
 ```{r}
 #creaing a data frame of tide heights at each seal survey time 
 survey_table <- data.frame(
-  SurveyTime = survey_times,  #column for times
+  Time = survey_times,  #column for times
   TideHeight = survey_tide_heights #column for heights corresponding to those heights 
 )
 
@@ -136,9 +136,9 @@ head(survey_table)
 ```{r}
 #creating a date frame with survey dates, survey times, tide heights, and seal count 
 survey_table_complete <- data.frame(
-  SurveyDateTime = survey_times, 
+  DateTime = survey_times, 
   TideHeight = survey_tide_heights, 
-  SealCount = surveys$Observed #number of seals observed 
+  CSLCount = surveys$Observed #number of seals observed 
 )
  #view the results 
 head(survey_table_complete)
@@ -150,12 +150,12 @@ head(survey_table_complete)
 
 ```{r}
 #tide height compared to observed seal counts
-ggplot(survey_table_complete, aes(x=TideHeight, y=SealCount)) +
+ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
   geom_point() +
   geom_smooth(method=lm) +
-  labs( title = "Seal Counts vs Tide Height", 
+  labs( title = "CSL Counts vs Tide Height", 
         x = "Tide Height", 
-        y = "Seal Count") #adding a title and axis labels 
+        y = "CSL Count") #adding a title and axis labels 
 ```
 
 We can see that their may be a slightly positive increase as seal count does increase with tide height. This is just a initially visualization of the data.
@@ -167,7 +167,7 @@ We can see that their may be a slightly positive increase as seal count does inc
 m.count.height <-
 brm(data = survey_table_complete, #gave the model the data 
 family = gaussian,#choose a normal distribution
-SealCount ~ 1 + TideHeight,
+CSLCount ~ 1 + TideHeight,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
 file = "output/m.count.height")
 
@@ -181,6 +181,67 @@ This model shows that for every 1 foot of tide change, there is an increase of 1
 ## Solar Radiation
 
 ```{r}
+#reading in solar radiation data
+solar <- read.csv("Solar Radiation.csv")
 
-solar <- read.csv("C:/Users/VioletLemley/ Documents/ds4eeb/CSL-Tide-176-Final-Project/Solar Radiation.csv")
+head(solar)
+
+#filtering solar radiation data to survey dates and times using closest time available (recorded every 10 minutes)
+
+#making vector with date and rounded times
+target_dates_solar <- as.character(c("2025-05-01 17:40:00", "2025-05-12 09:30:00", "2025-05-28 10:40:00", "2025-06-05 08:30:00", "2025-06-17 08:20:00", "2025-06-30 08:50:00", "2025-07-02 10:10:00", "2025-07-07 09:40:00", "2025-07-15 09:30:00", "2025-07-24 08:30:00", "2025-07-29 09:00:00", "2025-08-12 09:20:00", "2025-08-15 08:50:00", "2025-08-25 10:00:00"))
+
+
+#filtering entire data frame 
+survey_solar <- solar %>%
+  filter(Time %in% target_dates_solar) %>%
+  arrange(match(Time, target_dates_solar)) 
+
+
+```
+
+Separate date and time columns to be able to merge the data sheets into one without dealing with the rounded times
+
+```{r}
+#survey_table_complete seperation
+survey_table_complete.sep <- survey_table_complete %>%
+# Separate the site_year column
+separate(col = DateTime,
+# Separate into two columns in this case
+into = c("Date", "Time"),
+# Separate by 11 characters in
+sep = 11
+)
+
+#survey_solar seperation
+survey_solar.sep <- survey_solar %>%
+# Separate the site_year column
+separate(col = Time,
+# Separate into two columns in this case
+into = c("Date", "Time"),
+# Separate by 11 characters in
+sep = 11
+)
+```
+
+Merge the data frames
+
+```{r}
+#combining both df by Date
+merged_complete <- merge(survey_solar.sep, survey_table_complete.sep, by = "Date", all.x = TRUE)
+
+#renaming solar radiation column
+merged_complete <- merged_complete %>% rename("Solar Radiation" = "Año.Nuevo.Total.Solar.Radiation.Avg.W.m.2")
+
+#getting rid of rounded time (Time.x) column
+merged_complete <- merged_complete %>%
+  select(-Time.x)
+
+#rename Time.y to time
+merged_complete <- merged_complete %>% rename("Time" = "Time.y")
+
+#Reorder position of columns with time after date
+merged_complete <- merged_complete %>% 
+  relocate("Time", .before = "Solar Radiation")
+
 ```
