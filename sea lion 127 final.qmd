@@ -67,16 +67,6 @@ survey_tides <- survey_tides %>%
 head(survey_tides)
 ```
 
-<<<<<<< HEAD
-![]()
-
-### Seal Surveys
-
-Combining date and time columns in seal survey data
-=======
-![]() Using aprox to find the approximate tide heights at each time listed in the vector
->>>>>>> 4417695 (not sure here)
-
 ```{r}
 #combining date and time into one column for seal data 
 
@@ -126,7 +116,6 @@ survey_tide_heights <- approx(
   #xout is the seal survey date times
 ) $y #extracts the interpolated tide heights from the output 
 
-#created a vector of tide heights at each seal survey time 
 ```
 
 #### Creating a new table
@@ -142,7 +131,7 @@ survey_table <- data.frame(
 head(survey_table)
 ```
 
-### Putting it all together 
+### Putting it all together
 
 ```{r}
 #creating a date frame with survey dates, survey times, tide heights, and seal count 
@@ -157,7 +146,7 @@ head(survey_table_complete)
 
 ## Exploring the data
 
-### Simple plots? 
+### Simple plots?
 
 ```{r}
 #tide height compared to observed seal counts
@@ -171,7 +160,7 @@ ggplot(survey_table_complete, aes(x=TideHeight, y=SealCount)) +
 
 We can see that their may be a slightly positive increase as seal count does increase with tide height. This is just a initially visualization of the data.
 
-#### Seal count as a function of tide height 
+#### Seal count as a function of tide height
 
 ```{r}
 # Seal Count ~ Tide Height 
@@ -185,4 +174,13 @@ file = "output/m.count.height")
 #results 
 summary(m.count.height)
 plot(m.count.height)
+```
+
+This model shows that for every 1 foot of tide change, there is an increase of 1.88 tagged CSL.
+
+## Solar Radiation
+
+```{r}
+
+solar <- read.csv("C:/Users/VioletLemley/ Documents/ds4eeb/CSL-Tide-176-Final-Project/Solar Radiation.csv")
 ```
