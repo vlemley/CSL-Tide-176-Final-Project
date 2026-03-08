@@ -13,17 +13,18 @@ library(brms)
 library(hms)
 library(tidyverse)
 library(ggplot2) 
+library(ggeffects)
 library(dplyr)
 library(lubridate)
 tides <- read.csv("data/tides.csv")
 surveys <- read.csv("data/surveys.csv")
 ```
 
-## Editing the Data sets
+## Data Set Editing
 
-### Tides
+### Tide Data
 
-We need to select tide data from the dates of surveys and get rid of all other dates, this new data set will be called survey_tides
+Filtering out dates that surveys were not conducted.
 
 ```{r}
 # converting the column to date format
@@ -32,7 +33,7 @@ tides$Date <- as.Date(tides$Date, format = "%Y/%m/%d")
 # combine date and time into one column called date_time
 tides$date_time <- ymd_hm(paste(tides$Date, tides$Time))
 
-#creating vector with survey dates
+#creating vector with survey dates in order to filter out unecessary dates
 target_dates <- as.Date(c("2025-05-01", "2025-05-12", "2025-05-28", "2025-06-05", "2025-06-17", "2025-06-30", "2025-07-02", "2025-07-07", "2025-07-15", "2025-07-24", "2025-07-29", "2025-08-12", "2025-08-15", "2025-08-25"))
 
 #filtering out all other dates and saving as survey_tides
@@ -44,7 +45,7 @@ survey_tides <- tides %>%
 print(survey_tides)
 ```
 
-Combine Date and Time columns into DateTime to set up for finding specific tide height for each survey time and date
+Combine Date and Time columns into DateTime to find specific tide height for each survey time and date.
 
 ```{r}
 
@@ -67,12 +68,15 @@ survey_tides <- survey_tides %>%
 head(survey_tides)
 ```
 
+### CSL Count Data
+
+Combining date and time into one column, DateTime. This is required to align with DateTime in tide data.
+
 ```{r}
 #combining date and time into one column for seal data 
-
 surveys <- surveys %>%
  mutate(
-   DateTime=parse_date_time(paste(Date,Time), "Ymd HMS p") #formating time to 24 hr 
+   DateTime=parse_date_time(paste(Date,Time), "Ymd HMS") #formating time to 24 hr 
  )
 
 #removing the seperate date and time columns 
@@ -85,100 +89,9 @@ head(surveys)
 
 ```
 
-### Matching each seal survey to nearest tide measurement
+### Solar Radiation Data
 
-#### Creating vectors
-
-Pairing the seal survey dates vector with their corresponding time stamps
-
-```{r}
-#creating a vector of seal survey times 
-survey_time_vector <- c("17:43:30","09:32:42", "10:41:51", "08:28:14", "08:20:54", "08:52:25", "10:10:56", "09:38:41", "09:33:07", "08:27:45", "09:08:02", "09:18:32", "08:50:31", "09:59:10")
-
-#created a vector where each seal survey date is paired with its time stamp 
-survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
-                           format= "%Y-%m-%d %H:%M")
-
-
-```
-
-Using approx to find the approximate tide heights at each time listed in the vector
-
-```{r}
-#doing a linear interpolation to get the approximate tide heights for the times of the seal surveys, using the approx function
-
-survey_tide_heights <- approx(
-  x = as.numeric(tides$date_time),
-                      #x is tide datetimes
-  y = tides$Pred, 
-                    #y is the tide heights
-  xout= as.numeric(survey_times) 
-  #xout is the seal survey date times
-) $y #extracts the interpolated tide heights from the output 
-
-```
-
-#### Creating a new table
-
-```{r}
-#creaing a data frame of tide heights at each seal survey time 
-survey_table <- data.frame(
-  Time = survey_times,  #column for times
-  TideHeight = survey_tide_heights #column for heights corresponding to those heights 
-)
-
-# view results 
-head(survey_table)
-```
-
-### Putting it all together
-
-```{r}
-#creating a date frame with survey dates, survey times, tide heights, and seal count 
-survey_table_complete <- data.frame(
-  DateTime = survey_times, 
-  TideHeight = survey_tide_heights, 
-  CSLCount = surveys$Observed #number of seals observed 
-)
- #view the results 
-head(survey_table_complete)
-```
-
-## Exploring the data
-
-### Simple plots?
-
-```{r}
-#tide height compared to observed seal counts
-ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
-  geom_point() +
-  geom_smooth(method=lm) +
-  labs( title = "CSL Counts vs Tide Height", 
-        x = "Tide Height", 
-        y = "CSL Count") #adding a title and axis labels 
-```
-
-We can see that their may be a slightly positive increase as seal count does increase with tide height. This is just a initially visualization of the data.
-
-#### Seal count as a function of tide height
-
-```{r}
-# Seal Count ~ Tide Height 
-m.count.height <-
-brm(data = survey_table_complete, #gave the model the data 
-family = gaussian,#choose a normal distribution
-CSLCount ~ 1 + TideHeight,
-iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.count.height")
-
-#results 
-summary(m.count.height)
-plot(m.count.height)
-```
-
-This model shows that for every 1 foot of tide change, there is an increase of 1.88 tagged CSL.
-
-## Solar Radiation
+Filtering out dates and times that surveys were not conducted. Remaining data set will only include date and time of surveys.
 
 ```{r}
 #reading in solar radiation data
@@ -200,7 +113,7 @@ survey_solar <- solar %>%
 
 ```
 
-Separate date and time columns to be able to merge the data sheets into one without dealing with the rounded times
+Separate date and time columns to be able to merge this data sheets with CSL+Tide without dealing with the rounded times.
 
 ```{r}
 #survey_table_complete seperation
@@ -224,7 +137,53 @@ sep = 11
 )
 ```
 
-Merge the data frames
+### Combining Seal Surveys and Tide Data
+
+Pairing the seal survey dates vector with their corresponding time stamps.
+
+```{r}
+#creating a vector of seal survey times 
+survey_time_vector <- c("17:43:30","09:32:42", "10:41:51", "08:28:14", "08:20:54", "08:52:25", "10:10:56", "09:38:41", "09:33:07", "08:27:45", "09:08:02", "09:18:32", "08:50:31", "09:59:10")
+
+#created a vector where each seal survey date is paired with its time stamp 
+survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
+                           format= "%Y-%m-%d %H:%M")
+
+
+```
+
+Using approx to find the approximate tide heights at each time listed in the vector.
+
+```{r}
+#doing a linear interpolation to get the approximate tide heights for the times of the seal surveys, using the approx function
+
+survey_tide_heights <- approx(
+  x = as.numeric(tides$date_time),
+                      #x is tide datetimes
+  y = tides$Pred, 
+                    #y is the tide heights
+  xout= as.numeric(survey_times) 
+  #xout is the seal survey date times
+) $y #extracts the interpolated tide heights from the output 
+
+
+
+```
+
+```{r}
+#creaing a data frame of tide heights at each seal survey time 
+survey_table <- data.frame(
+  Time = survey_times,  #column for times
+  TideHeight = survey_tide_heights #column for heights corresponding to those heights 
+)
+
+#see the results
+head(survey_table_complete)
+```
+
+### Adding in Solar Radiation
+
+Merging solar radiation data and formatting final data set
 
 ```{r}
 #combining both df by Date
@@ -244,4 +203,143 @@ merged_complete <- merged_complete %>% rename("Time" = "Time.y")
 merged_complete <- merged_complete %>% 
   relocate("Time", .before = "Solar Radiation")
 
+head(merged_complete)
+```
+
+## Exploring the Data
+
+### Tide Height
+
+#### Scatter Plot
+
+Scatter Plot of Tide Height Effect on CSL Count
+
+```{r}
+#tide height compared to observed CSL counts
+ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  labs( title = "CSL Counts vs Tide Height", 
+        x = "Tide Height", 
+        y = "CSL Count") #adding a title and axis labels 
+```
+
+We can see that their may be a slightly positive increase as seal count does increase with tide height. This is just a initially visualization of the data.
+
+#### Model
+
+CSL Count as a Function of Tide Height
+
+```{r}
+# Seal Count ~ Tide Height 
+m.count.height <- 
+brm(data = survey_table_complete, #gave the model the data 
+family = gaussian,#choose a normal distribution
+CSLCount ~ TideHeight,
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
+file = "output/m.count.height")
+
+#results 
+summary(m.count.height)
+plot(m.count.height)
+```
+
+This model shows that for every 1 foot of tide change, there is an increase of 1.92 tagged CSL.
+
+#### Predictions
+
+```{r}
+preds.int <- predict_response(m.count.height,
+terms = c("TideHeight"))
+plot(preds.int, show_data = TRUE)
+```
+
+### Solar Radiation
+
+#### Scatter Plot
+
+```{r}
+# rename Solar Radiation to Solar_Radiation
+merged_complete <- merged_complete %>% rename("Solar_Radiation"= 'Solar Radiation')
+
+# scatterplot of solar radiation effect on CSL count
+ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  labs( title = "CSL Count vs Solar Radiation", 
+        x = "Solar Radiation", 
+        y = "CSL Count") #adding a title and axis label
+
+```
+
+```{r}
+#heatmap of solar radiation and tide height (COME BACK TO THIS)
+ggplot(merged_complete, aes(x = Solar_Radiation, y = TideHeight, fill = CSLCount)) +
+  geom_tile() +
+  geom_contour(aes(z = CSLCount), color = "white", alpha = 0.6) +
+  scale_fill_viridis_c(name = "CSL Count") +
+  labs(
+    x = "Solar Radiation",
+    y = "Tide Height",
+    title = "Heatmap of Solar Radiation and Tide Height Effects on CSL Count"
+  ) +
+  theme_minimal()
+```
+
+#### Model
+
+CSL Count as a Function of Solar Radiation
+
+```{r}
+m.CSL.Solar <-
+brm(data = merged_complete, #gave the model the data 
+family = gaussian,#choose a normal distribution
+CSLCount ~ Solar_Radiation,
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
+file = "output/m.CSL.Solar")
+
+#results 
+summary(m.CSL.Solar)
+plot(m.CSL.Solar)
+```
+
+This model shows no impact of solar radiation on CSL count. Shows that tides are actually important!
+
+#### Predictions
+
+```{r}
+preds.int <- predict_response(m.CSL.Solar,
+terms = c("Solar_Radiation"))
+plot(preds.int, show_data = TRUE)
+```
+
+### Additive
+
+#### Model
+
+```{r}
+# running additive model
+m.CSL.Solar.combined <-
+brm(data = merged_complete, #gave the model the data 
+family = gaussian,#choose a normal distribution
+CSLCount ~ Solar_Radiation + TideHeight,
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
+file = "output/m.CSL.Solar.combined")
+
+# summary stats
+summary(m.CSL.Solar.combined)
+plot(m.CSL.Solar.combined)
+
+
+```
+
+Again shows no impact of solar radiation on CSL count, only tide.
+
+#### Predictions
+
+```{r}
+# predictions for additive model
+preds.add <- predict_response(m.CSL.Solar.combined,
+terms = c("TideHeight", "Solar_Radiation"))
+plot(preds.add, show_data = TRUE)
 ```
