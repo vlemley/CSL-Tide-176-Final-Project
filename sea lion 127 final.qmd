@@ -6,6 +6,10 @@ gmf: default
 editor: visual
 ---
 
+# California Sea Lion Abundance Compared to NOAA Tide Data in 2025
+
+**Authors**: Violet Lemley, Veronika Watkins, Piper Miller
+
 ```{r}
 # read in tide and survery data
 library(here)
