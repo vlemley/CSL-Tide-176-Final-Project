@@ -40,32 +40,16 @@ target_dates <- as.Date(c("2025-05-01", "2025-05-12", "2025-05-28", "2025-06-05"
 survey_tides <- tides %>%
   filter(Date %in% target_dates) %>%
   arrange(match(Date, target_dates))  
-  
+
+# remove Day, Date, H/L, and Time column
+survey_tides <- survey_tides %>%
+  select(-Day, -Date, -Time, -High.Low)
+
+# rename date_time to DateTime
+survey_tides <- survey_tides %>% rename("DateTime" = "date_time")
+
 #view the results
 print(survey_tides)
-```
-
-Combine Date and Time columns into DateTime to find specific tide height for each survey time and date.
-
-```{r}
-
-# convert Date and Time to correct format
-Date = col_date(format = "")
-Time = col_time(format = "")
-
-# combine Date and Time columns into DateTime
-survey_tides %>%
-  mutate(
-    # convert hms to period, then add to Date
-    DateTime = as.POSIXct(Date) + period_to_seconds(as.period(Time))
-  )
-
-# remove Day, Date, and Time column
-survey_tides <- survey_tides %>%
-  select(-Day, -Date, -Time)
-
-# view the results
-head(survey_tides)
 ```
 
 ### CSL Count Data
@@ -86,7 +70,6 @@ surveys_CSL <- surveys_CSL %>%
 # view results 
 head(surveys_CSL)
 
-
 ```
 
 ### Solar Radiation Data
@@ -96,8 +79,6 @@ Filtering out dates and times that surveys were not conducted. Remaining data se
 ```{r}
 #reading in solar radiation data
 solar <- read.csv("Solar Radiation.csv")
-
-head(solar)
 
 #filtering solar radiation data to survey dates and times using closest time available (recorded every 10 minutes)
 
@@ -110,7 +91,7 @@ survey_solar <- solar %>%
   filter(Time %in% target_dates_solar) %>%
   arrange(match(Time, target_dates_solar)) 
 
-
+head(survey_solar)
 ```
 
 ### Combining Sea Lion Surveys and Tide Data
@@ -139,8 +120,9 @@ survey_tide_heights <- approx(
   y = tides$Pred, 
                     #y is the tide heights
   xout= as.numeric(survey_times) 
-  #xout is the CSL survey date times
-) $y #extracts the interpolated tide heights from the output 
+  #xout is the seal survey date times
+) $y #extracts the interpolated tide heights from the output
+
 
 ```
 
@@ -161,7 +143,6 @@ survey_table_complete <- data.frame(
 
 #see the results
 head(survey_table_complete)
-
 ```
 
 ### Adding in Solar Radiation
