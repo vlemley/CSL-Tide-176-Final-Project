@@ -240,7 +240,7 @@ We can see that their may be a slightly positive increase as CSL count does incr
 
 #### Comparing Tide Models
 
-CSL Count as a Function of Tide Height- Trying a Poisson Model
+CSL Count as a Function of Tide Height- Trying a **Poisson Model**
 
 ```{r}
 # CSL Count ~ Tide Height 
@@ -257,13 +257,13 @@ plot(m.count.height.poi)
 ```
 
 ```{r}
-mean(survey_table_complete$CSLCount)
-var(survey_table_complete$CSLCount)
+mean(survey_table_complete$CSLCount) # mean
+var(survey_table_complete$CSLCount) # variance
 ```
 
 This model ran correctly as the chains overlap each other and the posterior distributations are unimodal. Rhat is one but the 95%CI do overlap zero. Since the variance is much larger than the mean in this Poisson model, this means that this model is overdispersed.
 
-Trying a negative binomial model:
+Trying a **negative binomial model**:
 
 ```{r}
 
