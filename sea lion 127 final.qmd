@@ -73,7 +73,7 @@ head(survey_tides)
 Combining date and time into one column, DateTime. This is required to align with DateTime in tide data.
 
 ```{r}
-#combining date and time into one column for seal data 
+#combining date and time into one column for CSL data 
 surveys_CSL <- surveys %>%
  mutate(
    DateTime=parse_date_time(paste(Date,Time), "Ymd HMS") #formating time to 24 hr 
@@ -113,15 +113,15 @@ survey_solar <- solar %>%
 
 ```
 
-### Combining Seal Surveys and Tide Data
+### Combining Sea Lion Surveys and Tide Data
 
-Pairing the seal survey dates vector with their corresponding time stamps.
+Pairing the CSL survey dates vector with their corresponding time stamps.
 
 ```{r}
-#creating a vector of seal survey times 
+#creating a vector of CSL survey times 
 survey_time_vector <- c("17:43:30","09:32:42", "10:41:51", "08:28:14", "08:20:54", "08:52:25", "10:10:56", "09:38:41", "09:33:07", "08:27:45", "09:08:02", "09:18:32", "08:50:31", "09:59:10")
 
-#created a vector where each seal survey date is paired with its time stamp 
+#created a vector where each CSL survey date is paired with its time stamp 
 survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
                            format= "%Y-%m-%d %H:%M")
 
@@ -131,7 +131,7 @@ survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
 Using approx to find the approximate tide heights at each time listed in the vector.
 
 ```{r}
-#doing a linear interpolation to get the approximate tide heights for the times of the seal surveys, using the approx function
+#doing a linear interpolation to get the approximate tide heights for the times of the CSL surveys, using the approx function
 
 survey_tide_heights <- approx(
   x = as.numeric(tides$date_time),
@@ -139,13 +139,13 @@ survey_tide_heights <- approx(
   y = tides$Pred, 
                     #y is the tide heights
   xout= as.numeric(survey_times) 
-  #xout is the seal survey date times
+  #xout is the CSL survey date times
 ) $y #extracts the interpolated tide heights from the output 
 
 ```
 
 ```{r}
-#creaing a data frame of tide heights at each seal survey time 
+#creaing a data frame of tide heights at each CSL survey time 
 survey_table <- data.frame(
   Time = survey_times,  #column for times
   TideHeight = survey_tide_heights #column for heights corresponding to those heights 
@@ -155,7 +155,7 @@ survey_table <- data.frame(
 survey_table_complete <- data.frame(
   SurveyDateTime = survey_times, 
   TideHeight = survey_tide_heights, 
-  SealCount = surveys$Observed #number of seals observed 
+  CSLCount = surveys$Observed #number of CSLs observed 
 )
 
 
@@ -231,14 +231,14 @@ ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
         y = "CSL Count") #adding a title and axis labels 
 ```
 
-We can see that their may be a slightly positive increase as seal count does increase with tide height. This is just a initially visualization of the data.
+We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data.
 
 #### Model
 
 CSL Count as a Function of Tide Height
 
 ```{r}
-# Seal Count ~ Tide Height 
+# CSL Count ~ Tide Height 
 m.count.height <- 
 brm(data = survey_table_complete, #gave the model the data 
 family = gaussian,#choose a normal distribution
