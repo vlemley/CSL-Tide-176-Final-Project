@@ -297,6 +297,7 @@ The negative binomial model is a better predictive fit for this data since the W
 #### Predictions
 
 ```{r}
+# using the binomial model to predict the tide heights due to that model having better predictive power 
 preds.tides <- predict_response(m.count.height.negbi,
 terms = c("TideHeight"))
 plot(preds.tides, show_data = TRUE)
@@ -322,19 +323,7 @@ print(radiation.plot)
 ggsave("radiation.plot.png", plot = radiation.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
-```{r}
-#heatmap of solar radiation and tide height (COME BACK TO THIS)
-ggplot(merged_complete, aes(x = Solar_Radiation, y = TideHeight, fill = CSLCount)) +
-  geom_tile() +
-  geom_contour(aes(z = CSLCount), color = "white", alpha = 0.6) +
-  scale_fill_viridis_c(name = "CSL Count") +
-  labs(
-    x = "Solar Radiation",
-    y = "Tide Height",
-    title = "Heatmap of Solar Radiation and Tide Height Effects on CSL Count"
-  ) +
-  theme_minimal()
-```
+This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
 
 #### Model
 
@@ -382,7 +371,7 @@ plot(m.CSL.Solar.combined)
 
 ```
 
-Again shows no impact of solar radiation on CSL count, only tide.
+Again, shows no impact of solar radiation on CSL count, only tide. The estimate for solar radiation is 0.00
 
 #### Predictions
 
