@@ -204,12 +204,13 @@ Scatter Plot of Tide Height Effect on CSL Count
 
 ```{r}
 #tide height compared to observed CSL counts
-ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
-  geom_point() +
-  geom_smooth(method=lm) +
-  labs( title = "CSL Counts vs Tide Height", 
+ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount,)) +
+  geom_point(color = "steelblue1") +
+  geom_smooth(method=lm, color = "tan") +
+  labs(title = "CSL Counts vs Tide Height", 
         x = "Tide Height", 
-        y = "CSL Count") #adding a title and axis labels 
+        y = "CSL Count") + #adding a title and axis labels 
+  theme_minimal()
 ```
 
 We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data.
@@ -252,8 +253,8 @@ merged_complete <- merged_complete %>% rename("Solar_Radiation"= 'Solar Radiatio
 
 # scatterplot of solar radiation effect on CSL count
 ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
-  geom_point() +
-  geom_smooth(method=lm) +
+  geom_point(color = "steelblue1") +
+  geom_smooth(method=lm, color = "tan") +
   labs( title = "CSL Count vs Solar Radiation", 
         x = "Solar Radiation", 
         y = "CSL Count") #adding a title and axis label
