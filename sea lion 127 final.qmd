@@ -223,12 +223,25 @@ Scatter Plot of Tide Height Effect on CSL Count
 
 ```{r}
 #tide height compared to observed CSL counts
+<<<<<<< HEAD
 ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
   geom_point() +
   geom_smooth(method=lm) +
   labs( title = "CSL Counts vs Tide Height", 
         x = "Tide Height", 
         y = "CSL Count") #adding a title and axis labels 
+=======
+tide.plot = ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount,)) +
+  geom_point(color = "steelblue1") +
+  geom_smooth(method=lm, color = "tan") +
+  labs(title = "CSL Counts vs Tide Height", 
+        x = "Tide Height (m)", 
+        y = "CSL Count") + #adding a title and axis labels 
+  theme_minimal()
+print(tide.plot)
+
+ggsave("tide.plot.png", plot = tide.plot, width = 10, height = 6, units = "in") # saving the png
+>>>>>>> 2fddfaaa06cca3ea494a4c471560f1381b0a69a4
 ```
 
 We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data.
@@ -297,13 +310,21 @@ The negative binomial model is a better predictive fit for this data since the W
 merged_complete <- merged_complete %>% rename("Solar_Radiation"= 'Solar Radiation')
 
 # scatterplot of solar radiation effect on CSL count
+<<<<<<< HEAD
 ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
   geom_point() +
   geom_smooth(method=lm) +
+=======
+radiation.plot = ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
+  geom_point(color = "steelblue1") +
+  geom_smooth(method=lm, color = "tan") +
+>>>>>>> 2fddfaaa06cca3ea494a4c471560f1381b0a69a4
   labs( title = "CSL Count vs Solar Radiation", 
-        x = "Solar Radiation", 
+        x = "Solar Radiation (avg W/m^2)", 
         y = "CSL Count") #adding a title and axis label
+print(radiation.plot)
 
+ggsave("radiation.plot.png", plot = radiation.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
 ```{r}
