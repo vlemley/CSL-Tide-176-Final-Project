@@ -123,7 +123,7 @@ survey_time_vector <- c("17:43:30","09:32:42", "10:41:51", "08:28:14", "08:20:54
 
 #created a vector where each seal survey date is paired with its time stamp 
 survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
-                           format= "%Y-%m-%d %H:%M")
+                           format= "%Y-%m-%d %H:%M:%S")
 
 
 ```
