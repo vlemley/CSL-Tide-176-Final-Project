@@ -259,15 +259,6 @@ var(survey_table_complete$CSLCount)
 
 This model ran correctly as the chains overlap each other and the posterior distributations are unimodal. Rhat is one but the 95%CI do overlap zero. Since the variance is much larger than the mean in this Poisson model, this means that this model is overdispersed.
 
-Trying a
-
-#### Predictions
-
-```{r}
-
-
-```
-
 ### Solar Radiation
 
 #### Scatter Plot
@@ -287,20 +278,6 @@ ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
 ```
 
 This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
-
-```{r}
-#heatmap of solar radiation and tide height (COME BACK TO THIS)
-ggplot(merged_complete, aes(x = Solar_Radiation, y = TideHeight, fill = CSLCount)) +
-  geom_tile() +
-  geom_contour(aes(z = CSLCount), color = "white", alpha = 0.6) +
-  scale_fill_viridis_c(name = "CSL Count") +
-  labs(
-    x = "Solar Radiation",
-    y = "Tide Height",
-    title = "Heatmap of Solar Radiation and Tide Height Effects on CSL Count"
-  ) +
-  theme_minimal()
-```
 
 #### Model
 
