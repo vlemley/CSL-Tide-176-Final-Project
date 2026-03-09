@@ -6,10 +6,6 @@ gmf: default
 editor: visual
 ---
 
-# California Sea Lion Abundance Compared to NOAA Tide Data in 2025
-
-**Authors**: Violet Lemley, Veronika Watkins, Piper Miller
-
 ```{r}
 # read in tide and survery data
 library(here)
@@ -227,24 +223,23 @@ Scatter Plot of Tide Height Effect on CSL Count
 
 ```{r}
 #tide height compared to observed CSL counts
-ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount,)) +
-  geom_point(color = "steelblue1") +
-  geom_smooth(method=lm, color = "tan") +
-  labs(title = "CSL Counts vs Tide Height", 
+ggplot(survey_table_complete, aes(x=TideHeight, y=CSLCount)) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  labs( title = "CSL Counts vs Tide Height", 
         x = "Tide Height", 
-        y = "CSL Count") + #adding a title and axis labels 
-  theme_minimal()
+        y = "CSL Count") #adding a title and axis labels 
 ```
 
 We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data.
 
-#### Model
+#### Comparing Tide Models
 
 CSL Count as a Function of Tide Height- Trying a Poisson Model
 
 ```{r}
 # CSL Count ~ Tide Height 
-m.count.height <- 
+m.count.height.poi <- 
 brm(data = survey_table_complete, #gave the model the data 
 family = poisson, #choose a normal distribution
 CSLCount ~ TideHeight,
@@ -252,8 +247,8 @@ iter = 2000, warmup = 1000, chains = 4, cores = 4,
 file = "output/m.count.height/try")
 
 #results 
-summary(m.count.height)
-plot(m.count.height)
+summary(m.count.height.poi)
+plot(m.count.height.poi)
 ```
 
 ```{r}
@@ -262,6 +257,36 @@ var(survey_table_complete$CSLCount)
 ```
 
 This model ran correctly as the chains overlap each other and the posterior distributations are unimodal. Rhat is one but the 95%CI do overlap zero. Since the variance is much larger than the mean in this Poisson model, this means that this model is overdispersed.
+
+Trying a negative binomial model:
+
+```{r}
+# CSL Count ~ Tide Height 
+m.count.height.negbi <- 
+brm(data = survey_table_complete, #gave the model the data 
+family = negbinomial(), #choose a normal distribution
+CSLCount ~ TideHeight,
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
+file = "output/m.count.height/2nd")
+
+#results 
+summary(m.count.height.negbi)
+plot(m.count.height.negbi)
+```
+
+```{r}
+loo(m.count.height.poi)
+loo(m.count.height.negbi)
+```
+
+```{r}
+waic(m.count.height.poi)
+waic(m.count.height.negbi)
+```
+
+The negative binomial model is a better predictive fit for this data since the WAIC and LOOIC are lower compared to the Poisson model. This means this model will better predict our data than the Poisson model would.
+
+#### Predictions
 
 ### Solar Radiation
 
@@ -273,15 +298,27 @@ merged_complete <- merged_complete %>% rename("Solar_Radiation"= 'Solar Radiatio
 
 # scatterplot of solar radiation effect on CSL count
 ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
-  geom_point(color = "steelblue1") +
-  geom_smooth(method=lm, color = "tan") +
+  geom_point() +
+  geom_smooth(method=lm) +
   labs( title = "CSL Count vs Solar Radiation", 
         x = "Solar Radiation", 
         y = "CSL Count") #adding a title and axis label
 
 ```
 
-This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
+```{r}
+#heatmap of solar radiation and tide height (COME BACK TO THIS)
+ggplot(merged_complete, aes(x = Solar_Radiation, y = TideHeight, fill = CSLCount)) +
+  geom_tile() +
+  geom_contour(aes(z = CSLCount), color = "white", alpha = 0.6) +
+  scale_fill_viridis_c(name = "CSL Count") +
+  labs(
+    x = "Solar Radiation",
+    y = "Tide Height",
+    title = "Heatmap of Solar Radiation and Tide Height Effects on CSL Count"
+  ) +
+  theme_minimal()
+```
 
 #### Model
 
@@ -329,7 +366,7 @@ plot(m.CSL.Solar.combined)
 
 ```
 
-Again, shows no impact of solar radiation on CSL count, only tide. The estimate for solar radiation is 0.00.
+Again shows no impact of solar radiation on CSL count, only tide.
 
 #### Predictions
 
