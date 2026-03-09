@@ -296,6 +296,12 @@ The negative binomial model is a better predictive fit for this data since the W
 
 #### Predictions
 
+```{r}
+preds.tides <- predict_response(m.count.height.negbi,
+terms = c("TideHeight"))
+plot(preds.tides, show_data = TRUE)
+```
+
 ### Solar Radiation
 
 #### Scatter Plot
