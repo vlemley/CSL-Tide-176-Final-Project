@@ -74,17 +74,17 @@ Combining date and time into one column, DateTime. This is required to align wit
 
 ```{r}
 #combining date and time into one column for seal data 
-surveys <- surveys %>%
+surveys_CSL <- surveys %>%
  mutate(
    DateTime=parse_date_time(paste(Date,Time), "Ymd HMS") #formating time to 24 hr 
  )
 
 #removing the seperate date and time columns 
-surveys <- surveys %>%
+surveys_CSL <- surveys_CSL %>%
   select(-Date, -Time)
 
 # view results 
-head(surveys)
+head(surveys_CSL)
 
 
 ```
@@ -123,7 +123,7 @@ survey_time_vector <- c("17:43:30","09:32:42", "10:41:51", "08:28:14", "08:20:54
 
 #created a vector where each seal survey date is paired with its time stamp 
 survey_times <- as.POSIXct(paste(target_dates, survey_time_vector),
-                           format= "%Y-%m-%d %H:%M:%S")
+                           format= "%Y-%m-%d %H:%M")
 
 
 ```
@@ -174,7 +174,7 @@ Separate date and time columns to be able to merge this data sheets with CSL+Tid
 #survey_table_complete seperation
 survey_table_complete.sep <- survey_table_complete %>%
 # Separate the site_year column
-separate(col = DateTime,
+separate(col = SurveyDateTime,
 # Separate into two columns in this case
 into = c("Date", "Time"),
 # Separate by 11 characters in
