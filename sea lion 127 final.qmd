@@ -142,8 +142,6 @@ survey_tide_heights <- approx(
   #xout is the seal survey date times
 ) $y #extracts the interpolated tide heights from the output 
 
-
-
 ```
 
 ```{r}
