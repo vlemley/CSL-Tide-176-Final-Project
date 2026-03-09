@@ -261,6 +261,8 @@ ggplot(merged_complete, aes(x=Solar_Radiation, y=CSLCount)) +
 
 ```
 
+This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
+
 ```{r}
 #heatmap of solar radiation and tide height (COME BACK TO THIS)
 ggplot(merged_complete, aes(x = Solar_Radiation, y = TideHeight, fill = CSLCount)) +
@@ -321,7 +323,7 @@ plot(m.CSL.Solar.combined)
 
 ```
 
-Again shows no impact of solar radiation on CSL count, only tide.
+Again, shows no impact of solar radiation on CSL count, only tide. The estimate for solar radiation is 0.00.
 
 #### Predictions
 
