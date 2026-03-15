@@ -10,6 +10,8 @@ Email: pianmill@ucsc.edu
 ### Violet Lemley
 Email: vlemley@ucsc.edu
 
+With the help of Malin and Calvin, thank you!
+
 # SHARING/ACCESS INFORMATION
 
 All data is publically available through Ano Nuevo Natural Reserve, NOAA Tide Charts, and UC Nature DENDRA websites.
@@ -17,6 +19,19 @@ All data is publically available through Ano Nuevo Natural Reserve, NOAA Tide Ch
 Date of Data Collection: 2025-05-01 to 2025-08-31
 
 Geographic Location of Data Collection: Ano Nuevo Island, Pescadero CA
+
+## Background
+
+This project is looking at how tide heights impact the number of branded sea lions on Ano Nuevo Island. While Ano Nuevo is famous for its elphant seal, the island about a mile off of the coast is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily realy on haul outs to rest, molt, regulate body temperature. Their insulating fur is maintiend by oils in the skin and the most effective way for them to maintain their coat is by thuroughly drying off. This is most effectivley acomplished on dry land. 
+
+The first variable that we decided to look at was tide height. Not only is it less energetically expensive for CSL to jump from the water to the land during low tide, but it also exposes more viable land for them to occupy. Large amounts of dry land are most accessable during low tide and a greater amount of available space allows room for larger groups of animals to gather and reduces competition. 
+
+The second variable we looked at was solar radiaiton levels. Because sea lions rely on haul outs to dry their fur and solar radiation can contribute to drying rate, we wanted to see how solar radiation levels impacted the abundnace of branded inviduals. Our assumption is that there would be more individuals when the solar radiation levels are higher. 
+
+While this study is specifically looking at branded CSL, we hope that the relationship that this study establishes can be more widley applicable to all CSL. The observed individuals are branded by NOAA and are part of the West Coast Pinniped Branding program. They are captured, branded, released, and ideally never handeled by humans again. The idea of permanent branding is that it is a one time event that will not alter their permanent behavior. That being said, the branded CSL individuals should be a representative subset of how CSL would react to tide height. Analying this relationship will hopefully provide insight on the severity of the impact of tide height on CSL abundance. Ano Nuevo is an ideal location for this question because it has a well monitored popualtion of CSL and also has a dedicated NOAA tide site. 
+
+Our main question was: **How do tide height and solar radiation levels impact abundance of branded CSL on Ano Nuevo Island?** The target audience for this study are people who are doing CSL research and want to consider how environmental factors could be impacting the number of observed individuals. Obviously we are only looking at two envirnoemental factors but this methodology (using branded individuals as a subset of the total population) could be applied to other factors to get a sense of how they impact population data. 
+
 
 # DATA & FILE OVERVIEW
 
@@ -91,13 +106,21 @@ We included all of the raw data in our data file. The following is how we manipu
 All analysis done in **R version 4.5.2 (2025-10-31)**
 
 Packages:
+
 library(here)
+
 library(brms)
+
 library(hms)
+
 library(tidyverse)
+
 library(ggplot2) 
+
 library(ggeffects)
+
 library(dplyr)
+
 library(lubridate)
 
 # DATA-SPECIFIC INFORMATION (RAW DATA)
@@ -211,22 +234,68 @@ L: low tide
 # DATA-SPECIFIC INFORMATION (PROCESSED DATA)
 This is information on the most relevant processed data tables.
 
+## survey_table_complete
+
+Number of variables: 3
+
+Number of rows: 14
+
+### Variable list:
+
+#### SurveyDateTime
+
+Description: Date and time of survey
+
+Units: YYY-MM-DD HH:MM:SS
+
+#### TideHeight
+
+Description: Estimatated tide height at day and time of survey
+
+Units: meters
+
+#### CSLCount
+
+Description: Number of observed branded CSL individuals during the survey
+
+Units: count
 
 
+## merged_complete
+
+Number of variables: 4
+
+Number of rows: 14
+
+### Variable list:
+
+#### Date
+
+Description: Date of survey
+
+Units: YYY-MM-DD
 
 
-## Background
+#### Time
 
-This project is looking at how tide heights impact the number of branded sea lions on Ano Nuevo Island. While Ano Nuevo is famous for its elphant seal, the island about a mile off of the coast is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily realy on haul outs to rest, molt, regulate body temperature. Their insulating fur is maintiend by oils in the skin and the most effective way for them to maintain their coat is by thuroughly drying off. This is most effectivley acomplished on dry land. 
+Description: Time of survey
 
-The first variable that we decided to look at was tide height. Not only is it less energetically expensive for CSL to jump from the water to the land during low tide, but it also exposes more viable land for them to occupy. Large amounts of dry land are most accessable during low tide and a greater amount of available space allows room for larger groups of animals to gather and reduces competition. 
+Units: HH:MM:SS
 
-The second variable we looked at was solar radiaiton levels. Because sea lions rely on haul outs to dry their fur and solar radiation can contribute to drying rate, we wanted to see how solar radiation levels impacted the abundnace of branded inviduals. Our assumption is that there would be more individuals when the solar radiation levels are higher. 
+#### Solar_Radiation
 
-While this study is specifically looking at branded CSL, we hope that the relationship that this study establishes can be more widley applicable to all CSL. The observed individuals are branded by NOAA and are part of the West Coast Pinniped Branding program. They are captured, branded, released, and ideally never handeled by humans again. The idea of permanent branding is that it is a one time event that will not alter their permanent behavior. That being said, the branded CSL individuals should be a representative subset of how CSL would react to tide height. Analying this relationship will hopefully provide insight on the severity of the impact of tide height on CSL abundance. Ano Nuevo is an ideal location for this question because it has a well monitored popualtion of CSL and also has a dedicated NOAA tide site. 
+Description: Average solar radiation recorded to the closest 10 minutes to the time of the survey
 
-Our main question was: **How do tide height and solar radiation levels impact abundance of branded CSL on Ano Nuevo Island?** The target audience for this study are people who are doing CSL research and want to consider how environmental factors could be impacting the number of observed individuals. Obviously we are only looking at two envirnoemental factors but this methodology (using branded individuals as a subset of the total population) could be applied to other factors to get a sense of how they impact population data. 
+Units: W/m^2
 
+#### TideHeight
 
+Description: Estimatated tide height at day and time of survey
 
+Units: meters
 
+#### CSLCount
+
+Description: Number of observed branded CSL individuals during the survey
+
+Units: count
