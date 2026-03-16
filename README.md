@@ -10,7 +10,7 @@ Email: pianmill@ucsc.edu
 ### Violet Lemley
 Email: vlemley@ucsc.edu
 
-With the help of Malin and Calvin, thank you!
+With the help of Malin and Calvin, thank you both!
 
 # SHARING/ACCESS INFORMATION
 
@@ -22,15 +22,15 @@ Geographic Location of Data Collection: Ano Nuevo Island, Pescadero CA
 
 ## Background
 
-This project is looking at how tide heights impact the number of branded sea lions on Ano Nuevo Island. While Ano Nuevo is famous for its elphant seal, the island about a mile off of the coast is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily realy on haul outs to rest, molt, regulate body temperature. Their insulating fur is maintiend by oils in the skin and the most effective way for them to maintain their coat is by thuroughly drying off. This is most effectivley acomplished on dry land. 
+This project is looking at how tide heights impact the number of branded sea lions on Ano Nuevo Island. While Ano Nuevo is famous for its elephant seal, the island about a mile off of the coast is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily rely on haul outs to rest, molt, and regulate body temperature. Their insulating fur is maintained by oils in the skin and the most effective way for them to maintain their coat is by thoroughly drying off. This is most effectively accomplished on dry land. 
 
-The first variable that we decided to look at was tide height. Not only is it less energetically expensive for CSL to jump from the water to the land during low tide, but it also exposes more viable land for them to occupy. Large amounts of dry land are most accessable during low tide and a greater amount of available space allows room for larger groups of animals to gather and reduces competition. 
+The first variable that we decided to look at was tide height. Not only is it less energetically expensive for CSL to jump from the water to the land during low tide, but it also exposes more viable land for them to occupy. Large amounts of dry land are most accessible during low tide and a greater amount of available space allows room for larger groups of animals to gather and reduces competition. 
 
-The second variable we looked at was solar radiaiton levels. Because sea lions rely on haul outs to dry their fur and solar radiation can contribute to drying rate, we wanted to see how solar radiation levels impacted the abundnace of branded inviduals. Our assumption is that there would be more individuals when the solar radiation levels are higher. 
+The second variable we looked at was solar radiation levels. Because sea lions rely on haul outs to dry their fur and solar radiation can contribute to drying rate, we wanted to see how solar radiation levels impacted the abundance of branded individuals. Our assumption is that there would be more individuals when the solar radiation levels are higher. 
 
-While this study is specifically looking at branded CSL, we hope that the relationship that this study establishes can be more widley applicable to all CSL. The observed individuals are branded by NOAA and are part of the West Coast Pinniped Branding program. They are captured, branded, released, and ideally never handeled by humans again. The idea of permanent branding is that it is a one time event that will not alter their permanent behavior. That being said, the branded CSL individuals should be a representative subset of how CSL would react to tide height. Analying this relationship will hopefully provide insight on the severity of the impact of tide height on CSL abundance. Ano Nuevo is an ideal location for this question because it has a well monitored popualtion of CSL and also has a dedicated NOAA tide site. 
+While this study is specifically looking at branded CSL, we hope that the relationship that this study establishes can be more widely applicable to all CSL. The observed individuals are branded by NOAA and are part of the West Coast Pinniped Branding program. They are captured, branded, released, and ideally never handled by humans again. The idea of permanent branding is that it is a one time event that will not alter their permanent behavior. That being said, the branded CSL individuals should be a representative subset of how CSL would react to tide height. Analyzing this relationship will hopefully provide insight on the severity of the impact of tide height on CSL abundance. Ano Nuevo is an ideal location for this question because it has a well monitored population of CSL and also has a dedicated NOAA tide site. 
 
-Our main question was: **How do tide height and solar radiation levels impact abundance of branded CSL on Ano Nuevo Island?** The target audience for this study are people who are doing CSL research and want to consider how environmental factors could be impacting the number of observed individuals. Obviously we are only looking at two envirnoemental factors but this methodology (using branded individuals as a subset of the total population) could be applied to other factors to get a sense of how they impact population data. 
+Our main question was: **How do tide height and solar radiation levels impact abundance of branded CSL on Ano Nuevo Island?** The target audience for this study are people who are doing CSL research and want to consider how environmental factors could be impacting the number of observed individuals. Obviously we are only looking at two environmental factors but this methodology (using branded individuals as a subset of the total population) could be applied to other factors to get a sense of how they impact population data. 
 
 
 # DATA & FILE OVERVIEW
@@ -68,7 +68,7 @@ radiation.plot.png
 
 tide.plot.png
 
-**Models (relevantly labled in output folder)**
+**Models (relevantly labeled in output folder)**
 
 m.CSL.Tide.rds
 
@@ -83,11 +83,11 @@ m.CSL.Solar.Tide.Additive.rds
 
 ## Data Collection/Generation 
 
-**CSL Count**: This data is based off of drone imagrey taken on Ano Nuevo Island. As part of a long-term monitoring project, aerial surveys of the California Sea Lion populations on Ano Nuevo Island are taken 1-4 times a month (largley dependent on weather conditions). In 2025, surveys were conducted from May-August. Each survey contains around 100 images that capture a birds eye view 30 feet above the entire island. Violet worked with Ano Nuevo last summer and manually went through the images, recording the number of branded CSL. The date of the survey, the number of observed branded individuals, and the embeded time from each photograph was recorded.
+**CSL Count**: This data is based off of drone imagery taken on Ano Nuevo Island. As part of a long-term monitoring project, aerial surveys of the California Sea Lion populations on Ano Nuevo Island are taken 1-4 times a month (largely dependent on weather conditions). In 2025, surveys were conducted from May-August. Each survey contains around 100 images that capture a bird's eye view 30 feet above the entire island. Violet worked with Ano Nuevo last summer and manually went through the images, recording the number of branded CSL. The date of the survey, the number of observed branded individuals, and the embedded time from each photograph was recorded.
 
 **Tide Height**: We used [NOAA tide charts]([url](https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=9413878)) from the Ano Nuevo Island monitoring location. We extracted the low and high tides for each day from May-August 2025. 
 
-**Solar Radiation**: We used data from the [UC Nature DENDRA station at Ano Nuevo]([url](https://dendra.science/orgs/ucnrs/datastreams?faceted=true&scheme=dq&selectStationId=630ffc7fbcd7f8d98fe03a37)). It collects a wide variety of meteorelogical data every 10 minutes and we extracted the average solar radiation levels from May-August 2025.
+**Solar Radiation**: We used data from the [UC Nature DENDRA station at Ano Nuevo]([url](https://dendra.science/orgs/ucnrs/datastreams?faceted=true&scheme=dq&selectStationId=630ffc7fbcd7f8d98fe03a37)). It collects a wide variety of meteorological data every 10 minutes and we extracted the average solar radiation levels from May-August 2025.
 
 
 ## Data Processing Methods 
@@ -96,9 +96,9 @@ We included all of the raw data in our data file. The following is how we manipu
 
 **CSL Count**: Combined date and time into DateTime column (survey_CSL). 
 
-**Tide Height**: The imported file included two high and two low tides for every day in our selected time frame. We created a vector of our survey dates to only include relevant tide information (survey_tides). We also applied a linear aproximation formaula to estimate the tide height at the time of survey. Combined date and time into DateTime column to combine CSL count and Tide Height data (survey_table_complete)
+**Tide Height**: The imported file included two high and two low tides for every day in our selected time frame. We created a vector of our survey dates to only include relevant tide information (survey_tides). We also applied a linear approximation formula to estimate the tide height at the time of survey. Combined date and time into DateTime column to combine CSL count and Tide Height data (survey_table_complete)
 
-**Solar Radiation**: The imported file included average solar radiation every 10 minutes in our selected time frame. We used the same survey date vector so the data only included relvant days (survey_solar). Because the times in the solar radiaiton data were rounded, we merged all three data sets together by date, not time. This involved us seperating date and time in (survey_table_complete) and (survey_solar) and then recombining them into (merged_complete). 
+**Solar Radiation**: The imported file included average solar radiation every 10 minutes in our selected time frame. We used the same survey date vector so the data only included relevant days (survey_solar). Because the times in the solar radiation data were rounded, we merged all three data sets together by date, not time. This involved us separating date and time in (survey_table_complete) and (survey_solar) and then recombining them into (merged_complete). 
 
 
 ## Software Information 
@@ -153,7 +153,7 @@ Description: Number of branded CSL individuals observed during the survey
 Units: count
 
 
-### Specialzied formats
+### Specialized formats
 
 CSL: california sea lion
 
@@ -180,7 +180,7 @@ Description: Average Solar Radiation recorded at Ano Nuevo every
 
 Units: Watts per square meter (W/m^2)
 
-### Specialzied formats
+### Specialized formats
 
 Measurements are recorded at 10-minute intervals
 
@@ -219,11 +219,11 @@ Units: meters
 
 #### High/Low
 
-Description: Indicates wheater tide is high or low
+Description: Indicates whether tide is high or low
 
 Units: H=high tide, L=low tide
 
-### Specialzied formats
+### Specialized formats
 
 Tide heights are predicted values, not direct measurements
 
@@ -250,7 +250,7 @@ Units: YYY-MM-DD HH:MM:SS
 
 #### TideHeight
 
-Description: Estimatated tide height at day and time of survey
+Description: Estimated tide height at day and time of survey
 
 Units: meters
 
@@ -290,7 +290,7 @@ Units: W/m^2
 
 #### TideHeight
 
-Description: Estimatated tide height at day and time of survey
+Description: Estimated tide height at day and time of survey
 
 Units: meters
 
@@ -299,3 +299,5 @@ Units: meters
 Description: Number of observed branded CSL individuals during the survey
 
 Units: count
+
+
