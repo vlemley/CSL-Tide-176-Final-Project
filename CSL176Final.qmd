@@ -246,7 +246,7 @@ CSL Count as a Function of Tide Height- Trying a **Poisson Model**
 # CSL Count ~ Tide Height 
 m.CSLcount.Tideheight.poi <- 
 brm(data = survey_table_complete, #gave the model the data 
-family = poisson, #choose a normal distribution
+family = poisson, #choose a poisson distribution
 CSLCount ~ TideHeight,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
 file = "output/m.CSL.Tide")
