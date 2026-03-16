@@ -367,19 +367,20 @@ This plot shows that there might be a slight increase in CSL count as solar radi
 CSL Count as a Function of Solar Radiation
 
 ```{r}
-m.CSL.Solar <-
+# CSL Count ~ Solar Radiation 
+m.count.solar.negbi <- 
 brm(data = merged_complete, #gave the model the data 
-family = gaussian,#choose a normal distribution
+family = negbinomial(), #negative binomial
 CSLCount ~ Solar_Radiation,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.CSL.Solar")
+file = "output/m.count.solar.negbi")
 
 #results 
-summary(m.CSL.Solar)
-plot(m.CSL.Solar)
+summary(m.count.solar.negbi)
+plot(m.count.solar.negbi)
 ```
 
-This model shows no impact of solar radiation on CSL count. Shows that tides are actually important!
+The model ran nice. This model shows no impact of solar radiation on CSL count. Large uncertainty due to small sample size though.
 
 #### Predictions
 
