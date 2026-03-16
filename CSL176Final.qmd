@@ -329,12 +329,7 @@ print(radiation.plot)
 ggsave("radiation.plot.png", plot = radiation.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
-<<<<<<< HEAD:CSL176Final.qmd
-=======
 This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
-
->>>>>>> 594d3bb6ae9e90a5a8845d8cd284d0384e65fefa:sea lion 127 final.qmd
-#### Model
 
 CSL Count as a Function of Solar Radiation
 
@@ -382,9 +377,8 @@ plot(m.CSL.Solar.additive)
 
 ```
 
-<<<<<<< HEAD:CSL176Final.qmd
 This model did not run well and we couldn't really get it to converge properly. Again shows no impact of solar radiation on CSL count, only tide.
-=======
+
 Again, shows no impact of solar radiation on CSL count, only tide. The estimate for solar radiation is 0.00
 
 #### Predictions
