@@ -133,7 +133,7 @@ Filtering out dates and times that surveys were not conducted. Remaining data se
 
 ```{r}
 #reading in solar radiation data
-solar <- read.csv("Solar Radiation.csv")
+solar <- read.csv("data/Solar Radiation.csv")
 
 head(solar)
 
@@ -235,7 +235,7 @@ Merging solar radiation data and formatting final data set
 merged_complete <- merge(survey_solar.sep, survey_table_complete.sep, by = "Date", all.x = TRUE)
 
 #renaming solar radiation column
-merged_complete <- merged_complete %>% rename("Solar Radiation" = "Año.Nuevo.Total.Solar.Radiation.Avg.W.m.2")
+merged_complete <- merged_complete %>% rename("Solar_Radiation" = "Año.Nuevo.Total.Solar.Radiation.Avg.W.m.2")
 
 #getting rid of rounded time (Time.x) column
 merged_complete <- merged_complete %>%
@@ -246,7 +246,7 @@ merged_complete <- merged_complete %>% rename("Time" = "Time.y")
 
 #Reorder position of columns with time after date
 merged_complete <- merged_complete %>% 
-  relocate("Time", .before = "Solar Radiation")
+  relocate("Time", .before = "Solar_Radiation")
 
 head(merged_complete)
 ```
@@ -281,16 +281,16 @@ CSL Count as a Function of Tide Height- Trying a **Poisson Model**
 
 ```{r}
 # CSL Count ~ Tide Height 
-m.count.height.poi <- 
+m.CSL.Tide.poi <- 
 brm(data = survey_table_complete, #gave the model the data 
 family = poisson, #choose a normal distribution
 CSLCount ~ TideHeight,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.count.height/try")
+file = "output/m.CSL.Tide")
 
 #results 
-summary(m.count.height.poi)
-plot(m.count.height.poi)
+summary(m.CSL.Tide.poi)
+plot(m.CSL.Tide.poi)
 ```
 
 ```{r}
@@ -305,20 +305,28 @@ Marine mammal researchers can sometimes use negative binomial models because mar
 Trying a **negative binomial model**:
 
 ```{r}
+# Stronger priors (didn't really do anything)
+prior <- c(
+  set_prior("normal(0, 0.7)", class = "Intercept"),
+  set_prior("normal(0, 0.3)", class = "b"),
+  set_prior("exponential(3)", class = "shape")
+)
+
 # CSL Count ~ Tide Height 
-m.count.height.negbi <- 
+m.CSL.Tide2.negbi <- 
 brm(data = survey_table_complete, #gave the model the data 
 family = negbinomial(), #choose a normal distribution
 CSLCount ~ TideHeight,
+prior = prior,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.count.height/2nd")
+file = "output/m.CSL.Tide2")
 
 #results 
-summary(m.count.height.negbi)
-plot(m.count.height.negbi)
+summary(m.CSL.Tide2.negbi)
+plot(m.CSL.Tide2.negbi)
 ```
 
-This model showed that for each 1 meter increase in tide height multiplies the expected CSL count by about 1.73. The CI does contain zero, indicating substantial uncertainty. This could be due to our small sample size. We tried some stronger priors, but this still did not help because the data set is too small.
+This model showed that for each 1 meter increase in tide height multiplies the expected CSL count by a factor of about 1.73. The CI does contain zero, indicating substantial uncertainty. This could be due to our small sample size. We tried some stronger priors, but this still did not help because the data set is too small.
 
 ```{r}
 loo(m.count.height.poi)
@@ -367,17 +375,18 @@ This plot shows that there might be a slight increase in CSL count as solar radi
 CSL Count as a Function of Solar Radiation
 
 ```{r}
-# CSL Count ~ Solar Radiation 
-m.count.solar.negbi <- 
+#negative binomial model
+m.CSL.Solar <-
 brm(data = merged_complete, #gave the model the data 
-family = negbinomial(), #negative binomial
+family = negbinomial(),#choose a negative binomial distribution (guassian wouldn't converge)
+control = list(adapt_delta = 0.95), #increasing delta because of divergent transitions
 CSLCount ~ Solar_Radiation,
-iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.count.solar.negbi")
+iter = 4000, warmup = 1000, chains = 4, cores = 4, #increased interations for model to fit
+file = "output/m.CSL.Solar")
 
 #results 
-summary(m.count.solar.negbi)
-plot(m.count.solar.negbi)
+summary(m.CSL.Solar)
+plot(m.CSL.Solar)
 ```
 
 The model ran nice. This model shows no impact of solar radiation on CSL count. Large uncertainty due to small sample size though.
@@ -396,16 +405,16 @@ plot(preds.int, show_data = TRUE)
 
 ```{r}
 # running additive model
-m.CSL.Solar.combined <-
+m.CSL.Solar.additive <-
 brm(data = merged_complete, #gave the model the data 
 family = gaussian,#choose a normal distribution
 CSLCount ~ Solar_Radiation + TideHeight,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.CSL.Solar.combined")
+file = "output/m.CSL.Solar.additive")
 
 # summary stats
-summary(m.CSL.Solar.combined)
-plot(m.CSL.Solar.combined)
+summary(m.CSL.Solar.additive)
+plot(m.CSL.Solar.additive)
 
 ```
 
