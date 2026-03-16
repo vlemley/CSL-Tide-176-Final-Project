@@ -6,9 +6,19 @@ gmf: default
 editor: visual
 ---
 
-# California Sea Lion Abundance Compared to NOAA Tide Data in 2025
+# California Sea Lion Abundance Compared to Tide and Solar Radiation Data in 2025
 
 **Authors**: Violet Lemley, Veronika Watkins, Piper Miller
+
+## Question
+
+How do tide height and solar radiation levels impact abundance of branded California Sea Lions on Ano Nuevo Island?
+
+## Importance
+
+Ano Nuevo Island is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily rely on haul outs to rest, molt, regulate body temperature, and most importantly, dry their fur. Dry fur is important to maintain its waterproofing, insulating coat and regulate body temperature, allowing oils in their skin to penetrate their fur. We wanted to see how tide height and average solar radiation impacted the number of branded CSL on the island.
+
+This study is specifically looking at **branded** **CSL.** The observed individuals are branded by NOAA and are part of the West Coast Pinniped Branding program. They are captured, branded, released, and ideally never handled by humans again. Ideally, the branded CSL individuals would be a representative subset of how CSL would react to these factors.
 
 ```{r}
 # read in tide and survery data
@@ -23,6 +33,30 @@ library(lubridate)
 tides <- read.csv("data/tides.csv")
 surveys <- read.csv("data/surveys.csv")
 ```
+
+## The Data
+
+**NOAA Tide Height Data**
+
+-   Ano Nuevo Island Station
+
+-   05/01/2025-12/31/2025
+
+**Average Solar Radiation Levels**
+
+-   Ano Nuevo Dendra Meteorology Station
+
+-   05/01/2025-08/31/2025
+
+**Tagged California Sea Lion counts on Ano Nuevo Island**
+
+-   05/01/2025- 08/25/2025
+
+-   Monthly/Bi-monthly drone surveys of ANI
+
+-   Visual analysis of surveys to identify branded individuals
+
+-   Work done summer of 2025
 
 ## Data Set Editing
 
@@ -239,7 +273,7 @@ print(tide.plot)
 ggsave("tide.plot.png", plot = tide.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
-We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data.
+We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data. This Goes against our initial prediction that a lower tide height would show an increase in CSL abundance.
 
 #### Comparing Tide Models
 
@@ -266,6 +300,8 @@ var(survey_table_complete$CSLCount) # variance
 
 This model ran correctly as the chains overlap each other and the posterior distributations are unimodal. Rhat is one but the 95%CI do overlap zero. Since the variance is much larger than the mean in this Poisson model, this means that this model is overdispersed.
 
+Marine mammal researchers can sometimes use negative binomial models because marine mammal data frames are typically clustered and not random. This can lead to overdispersed count data in other model types. Negative binomial models account for that extra variability and can give a more reliable prediction.
+
 Trying a **negative binomial model**:
 
 ```{r}
@@ -281,6 +317,8 @@ file = "output/m.count.height/2nd")
 summary(m.count.height.negbi)
 plot(m.count.height.negbi)
 ```
+
+This model showed that for each 1 meter increase in tide height multiplies the expected CSL count by about 1.73. The CI does contain zero, indicating substantial uncertainty. This could be due to our small sample size. We tried some stronger priors, but this still did not help because the data set is too small.
 
 ```{r}
 loo(m.count.height.poi)
@@ -322,7 +360,7 @@ print(radiation.plot)
 ggsave("radiation.plot.png", plot = radiation.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
-This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
+This plot shows that there might be a slight increase in CSL count as solar radiation increases. This is just our initial visualization. This agrees with our prediction that as solar radiation increases, so would CSL count.
 
 #### Model
 
@@ -388,3 +426,7 @@ loo(m.CSL.Solar)
 ```
 
 PSIS analysis shows that the model only looking at solar radiation has better predictive power than the additive model. WAIC had a waic estimate greater than 0.4 so we used PSIS instead.
+
+## Bias
+
+Our study had a very limited sample size, so this it is difficult to use this to represent a larger population of CSL. Our surveys were also taken around the same time of day. All but one were taken between 8-11 am. Another potential bias could be the time of year. The surverys capture May through August which is a narrow view of the annual CSL cycle. Late June through early August is their breeding season.
