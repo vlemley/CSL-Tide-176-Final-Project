@@ -6,9 +6,19 @@ gmf: default
 editor: visual
 ---
 
-# California Sea Lion Abundance Compared to NOAA Tide Data in 2025
+# California Sea Lion Abundance Compared to Tide and Solar Radiation Data in 2025
 
 **Authors**: Violet Lemley, Veronika Watkins, Piper Miller
+
+## Question
+
+How do tide height and solar radiation levels impact abundance of branded California Sea Lions on Ano Nuevo Island?
+
+## Importance
+
+Ano Nuevo Island is an important haul out zone for California Sea Lions (CSL). CSL can be at sea for weeks but heavily rely on haul outs to rest, molt, regulate body temperature, and most importantly, dry their fur. Dry fur is important to maintain its waterproofing, insulating coat and regulate body temperature, allowing oils in their skin to penetrate their fur. We wanted to see how tide height and average solar radiation impacted the number of branded CSL on the island.
+
+This study is specifically looking at **branded** **CSL.** The observed individuals are branded by NOAA and are part of the West Coast Pinniped Branding program. They are captured, branded, released, and ideally never handled by humans again. Ideally, the branded CSL individuals would be a representative subset of how CSL would react to these factors.
 
 ```{r}
 # read in tide and survery data
@@ -20,9 +30,33 @@ library(ggplot2)
 library(ggeffects)
 library(dplyr)
 library(lubridate)
-tides <- read_csv("data/tides.csv")
-surveys <- read_csv("data/surveys.csv")
+tides <- read.csv("data/tides.csv")
+surveys <- read.csv("data/surveys.csv")
 ```
+
+## The Data
+
+**NOAA Tide Height Data**
+
+-   Ano Nuevo Island Station
+
+-   05/01/2025-12/31/2025
+
+**Average Solar Radiation Levels**
+
+-   Ano Nuevo Dendra Meteorology Station
+
+-   05/01/2025-08/31/2025
+
+**Tagged California Sea Lion counts on Ano Nuevo Island**
+
+-   05/01/2025- 08/25/2025
+
+-   Monthly/Bi-monthly drone surveys of ANI
+
+-   Visual analysis of surveys to identify branded individuals
+
+-   Work done summer of 2025
 
 ## Data Set Editing
 
@@ -31,8 +65,11 @@ surveys <- read_csv("data/surveys.csv")
 Filtering out dates that surveys were not conducted.
 
 ```{r}
+# converting the column to date format
+tides$Date <- as.Date(tides$Date, format = "%Y/%m/%d")
+
 # combine date and time into one column called date_time
-tides$date_time <- as.POSIXct(tides$Date) + tides$Time
+tides$date_time <- ymd_hm(paste(tides$Date, tides$Time))
 
 #creating vector with survey dates in order to filter out unecessary dates
 target_dates <- as.Date(c("2025-05-01", "2025-05-12", "2025-05-28", "2025-06-05", "2025-06-17", "2025-06-30", "2025-07-02", "2025-07-07", "2025-07-15", "2025-07-24", "2025-07-29", "2025-08-12", "2025-08-15", "2025-08-25"))
@@ -96,7 +133,7 @@ Filtering out dates and times that surveys were not conducted. Remaining data se
 
 ```{r}
 #reading in solar radiation data
-solar <- read.csv("data/Solar Radiation.csv")
+solar <- read.csv("Solar Radiation.csv")
 
 head(solar)
 
@@ -180,7 +217,7 @@ into = c("Date", "Time"),
 sep = 11
 )
 
-#survey_solar seperation 
+#survey_solar seperation
 survey_solar.sep <- survey_solar %>%
 # Separate the site_year column
 separate(col = Time,
@@ -236,7 +273,7 @@ print(tide.plot)
 ggsave("tide.plot.png", plot = tide.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
-We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data.
+We can see that their may be a slightly positive increase as CSL count does increase with tide height. This is just a initially visualization of the data. This Goes against our initial prediction that a lower tide height would show an increase in CSL abundance.
 
 #### Comparing Tide Models
 
@@ -244,12 +281,12 @@ CSL Count as a Function of Tide Height- Trying a **Poisson Model**
 
 ```{r}
 # CSL Count ~ Tide Height 
-m.CSLcount.Tideheight.poi <- 
+m.count.height.poi <- 
 brm(data = survey_table_complete, #gave the model the data 
 family = poisson, #choose a normal distribution
 CSLCount ~ TideHeight,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.CSL.Tide")
+file = "output/m.count.height/try")
 
 #results 
 summary(m.count.height.poi)
@@ -263,30 +300,25 @@ var(survey_table_complete$CSLCount) # variance
 
 This model ran correctly as the chains overlap each other and the posterior distributations are unimodal. Rhat is one but the 95%CI do overlap zero. Since the variance is much larger than the mean in this Poisson model, this means that this model is overdispersed.
 
+Marine mammal researchers can sometimes use negative binomial models because marine mammal data frames are typically clustered and not random. This can lead to overdispersed count data in other model types. Negative binomial models account for that extra variability and can give a more reliable prediction.
+
 Trying a **negative binomial model**:
 
 ```{r}
-
-# Stronger priors (didn't really do anything)
-prior <- c(
-  set_prior("normal(0, 0.7)", class = "Intercept"),
-  set_prior("normal(0, 0.3)", class = "b"),
-  set_prior("exponential(3)", class = "shape")
-)
-
 # CSL Count ~ Tide Height 
 m.count.height.negbi <- 
 brm(data = survey_table_complete, #gave the model the data 
 family = negbinomial(), #choose a normal distribution
 CSLCount ~ TideHeight,
-prior = prior,
 iter = 2000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.CSL.Tide2")
+file = "output/m.count.height/2nd")
 
 #results 
 summary(m.count.height.negbi)
 plot(m.count.height.negbi)
 ```
+
+This model showed that for each 1 meter increase in tide height multiplies the expected CSL count by about 1.73. The CI does contain zero, indicating substantial uncertainty. This could be due to our small sample size. We tried some stronger priors, but this still did not help because the data set is too small.
 
 ```{r}
 loo(m.count.height.poi)
@@ -303,7 +335,6 @@ The negative binomial model is a better predictive fit for this data since the W
 #### Predictions
 
 ```{r}
-# using the binomial model to predict the tide heights due to that model having better predictive power 
 preds.tides <- predict_response(m.count.height.negbi,
 terms = c("TideHeight"))
 plot(preds.tides, show_data = TRUE)
@@ -329,18 +360,18 @@ print(radiation.plot)
 ggsave("radiation.plot.png", plot = radiation.plot, width = 10, height = 6, units = "in") # saving the png
 ```
 
-This plot shows that there is a slight increase in CSL count as solar radiation increases. This is just our initial visualization.
+This plot shows that there might be a slight increase in CSL count as solar radiation increases. This is just our initial visualization. This agrees with our prediction that as solar radiation increases, so would CSL count.
+
+#### Model
 
 CSL Count as a Function of Solar Radiation
 
 ```{r}
-
 m.CSL.Solar <-
 brm(data = merged_complete, #gave the model the data 
-family = negbinomial(),#choose a negative binomial distribution (guassian wouldn't converge)
-control = list(adapt_delta = 0.95), #increasing delta because of divergent transitions
+family = gaussian,#choose a normal distribution
 CSLCount ~ Solar_Radiation,
-iter = 4000, warmup = 1000, chains = 4, cores = 4, #increased interations for model to fit
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
 file = "output/m.CSL.Solar")
 
 #results 
@@ -348,7 +379,7 @@ summary(m.CSL.Solar)
 plot(m.CSL.Solar)
 ```
 
-This model shows no impact of solar radiation on CSL count (estimate=0.00).
+This model shows no impact of solar radiation on CSL count. Shows that tides are actually important!
 
 #### Predictions
 
@@ -364,20 +395,18 @@ plot(preds.int, show_data = TRUE)
 
 ```{r}
 # running additive model
-m.CSL.Solar.additive <-
+m.CSL.Solar.combined <-
 brm(data = merged_complete, #gave the model the data 
-family = poisson(),#choose a normal distribution
+family = gaussian,#choose a normal distribution
 CSLCount ~ Solar_Radiation + TideHeight,
-iter = 4000, warmup = 1000, chains = 4, cores = 4,
-file = "output/m.CSL.Solar.Tide.additive")
+iter = 2000, warmup = 1000, chains = 4, cores = 4,
+file = "output/m.CSL.Solar.combined")
 
 # summary stats
-summary(m.CSL.Solar.additive)
-plot(m.CSL.Solar.additive)
+summary(m.CSL.Solar.combined)
+plot(m.CSL.Solar.combined)
 
 ```
-
-This model did not run well and we couldn't really get it to converge properly. Again shows no impact of solar radiation on CSL count, only tide.
 
 Again, shows no impact of solar radiation on CSL count, only tide. The estimate for solar radiation is 0.00
 
@@ -397,3 +426,7 @@ loo(m.CSL.Solar)
 ```
 
 PSIS analysis shows that the model only looking at solar radiation has better predictive power than the additive model. WAIC had a waic estimate greater than 0.4 so we used PSIS instead.
+
+## Bias
+
+Our study had a very limited sample size, so this it is difficult to use this to represent a larger population of CSL. Our surveys were also taken around the same time of day. All but one were taken between 8-11 am. Another potential bias could be the time of year. The surverys capture May through August which is a narrow view of the annual CSL cycle. Late June through early August is their breeding season.
